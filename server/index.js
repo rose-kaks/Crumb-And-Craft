@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import productRoutes from './routes/productRoutes.js';
 import offerRoutes from './routes/offerRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
+import rbacRoutes from './routes/rbacRoutes.js';
 
 import {
   requestLogger,
@@ -15,6 +16,8 @@ import {
 dotenv.config();
 
 const app = express();
+
+app.use('/api/rbac', rbacRoutes);
 
 
 // MIDDLEWARE
