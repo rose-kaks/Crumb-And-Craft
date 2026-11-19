@@ -1,4 +1,3 @@
-
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
@@ -8,42 +7,97 @@ import productRoutes from './routes/productRoutes.js';
 import offerRoutes from './routes/offerRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 
+import {
+  requestLogger,
+  globalErrorHandler
+} from './middleware/pipeline.js';
+
 dotenv.config();
 
 const app = express();
 
+
+// MIDDLEWARE
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173'
+  origin:
+    process.env.CLIENT_URL ||
+    'http://localhost:5173'
 }));
 
 app.use(express.json());
 
+
+// REQUEST LOGGER
+app.use(requestLogger);
+
+
 // DATABASE CONNECTION
-mongoose.connect(process.env.MONGO_URI, {
-  dbName: 'crumb_and_craft_db'
-})
+mongoose.connect(
+  process.env.MONGO_URI,
+  {
+    dbName:
+      'crumb_and_craft_db'
+  }
+)
 .then(() => {
-  console.log('[DB] Connected to Crumb & Craft MongoDB');
+  console.log(
+    '[DB] Connected to Crumb & Craft MongoDB'
+  );
 })
 .catch((error) => {
-  console.error('[DB] Connection failed:', error.message);
+  console.error(
+    '[DB] Connection failed:',
+    error.message
+  );
 });
+
 
 // HEALTH CHECK
-app.get('/api/health', (req, res) => {
-  res.json({
-    status: 'OK',
-    service: 'Crumb & Craft Bakery API'
-  });
-});
+app.get(
+  '/api/health',
+  (req, res) => {
+
+    res.json({
+      status: 'OK',
+      service:
+        'Crumb & Craft Bakery API'
+    });
+
+  }
+);
+
 
 // API ROUTES
-app.use('/api/products', productRoutes);
-app.use('/api/offers', offerRoutes);
-app.use('/api/orders', orderRoutes);
+app.use(
+  '/api/products',
+  productRoutes
+);
 
-const PORT = process.env.PORT || 5000;
+app.use(
+  '/api/offers',
+  offerRoutes
+);
 
-app.listen(PORT, () => {
-  console.log(`[SERVER] Listening on http://localhost:${PORT}`);
-});
+app.use(
+  '/api/orders',
+  orderRoutes
+);
+
+
+// GLOBAL ERROR HANDLER
+app.use(
+  globalErrorHandler
+);
+
+
+const PORT =
+  process.env.PORT || 5000;
+
+app.listen(
+  PORT,
+  () => {
+    console.log(
+      `[SERVER] Listening on http://localhost:${PORT}`
+    );
+  }
+);
