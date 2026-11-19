@@ -1,16 +1,23 @@
-import { useEffect, useState } from 'react';
-import axios from 'axios';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import HomePage from './pages/HomePage';
+import CakeMenuPage from './pages/CakeMenuPage';
+import CakeCustomizerPage from './pages/CakeCustomizerPage';
+import CartPage from './pages/CartPage';
+import OrdersPage from './pages/OrdersPage';
+import LoginPage from './pages/LoginPage';
 export default function App() {
-const [serverStatus, setServerStatus] = useState('Checking API...');
-useEffect(() => {
-axios.get('http://localhost:5000/api/health')
-.then((res) => setServerStatus(`${res.data.service}: ${res.data.status}`))
-.catch(() => setServerStatus('Backend unreachable'));
-}, []);
 return (
-<main style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
-<h1>Crumb &amp; Craft — Custom Cake Pre-Order Store</h1>
-<p>System Status: <strong>{serverStatus}</strong></p>
-</main>
+<BrowserRouter>
+<Navbar cartCount={2} />
+<Routes>
+<Route path="/" element={<HomePage />} />
+<Route path="/menu" element={<CakeMenuPage />} />
+<Route path="/cakes/:id" element={<CakeCustomizerPage />} />
+<Route path="/cart" element={<CartPage />} />
+<Route path="/orders" element={<OrdersPage />} />
+<Route path="/login" element={<LoginPage />} />
+</Routes>
+</BrowserRouter>
 );
 }

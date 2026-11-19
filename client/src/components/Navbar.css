@@ -1,0 +1,318 @@
+.navbar {
+  height: 82px;
+  padding: 0 6%;
+  background: rgba(255, 250, 247, 0.96);
+
+  display: flex;
+  align-items: center;
+  gap: 35px;
+
+  border-bottom: 1px solid #f0dfd7;
+
+  position: sticky;
+  top: 0;
+  z-index: 100;
+
+  backdrop-filter: blur(12px);
+}
+
+/* BRAND */
+
+.brand {
+  text-decoration: none;
+  color: #3a241d;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  min-width: 220px;
+}
+
+.brand-mark {
+  width: 39px;
+  height: 39px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 50%;
+
+  background: #8f4f3c;
+  color: #fff;
+
+  font-size: 16px;
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+}
+
+.brand-text strong {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 19px;
+  font-weight: 600;
+}
+
+.brand-text small {
+  margin-top: 6px;
+
+  font-family: Arial, sans-serif;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 2.5px;
+
+  color: #b06d55;
+}
+
+/* SEARCH */
+
+.search-form {
+  height: 43px;
+  flex: 1;
+  max-width: 400px;
+
+  display: flex;
+  align-items: center;
+
+  background: #fff;
+  border: 1px solid #ead8d0;
+  border-radius: 999px;
+
+  overflow: hidden;
+
+  transition: 0.2s ease;
+}
+
+.search-form:focus-within {
+  border-color: #c99582;
+  box-shadow: 0 0 0 4px rgba(181, 110, 84, 0.08);
+}
+
+.search-icon {
+  margin-left: 17px;
+  color: #a98b80;
+  font-size: 21px;
+}
+
+.search-form input {
+  flex: 1;
+  min-width: 0;
+
+  border: none;
+  outline: none;
+
+  background: transparent;
+
+  padding: 0 10px;
+
+  font-size: 12px;
+  color: #432a21;
+}
+
+.search-form input::placeholder {
+  color: #b49b92;
+}
+
+.search-form button {
+  height: 100%;
+  padding: 0 19px;
+
+  border: none;
+  background: #fff2eb;
+
+  color: #8f4f3c;
+
+  font-size: 11px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.search-form button:hover {
+  background: #f6dfd5;
+}
+
+/* NAV LINKS */
+
+.nav-links {
+  margin-left: auto;
+
+  display: flex;
+  align-items: center;
+  gap: 25px;
+
+  white-space: nowrap;
+}
+
+.nav-links a {
+  position: relative;
+
+  text-decoration: none;
+
+  color: #725b52;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  transition: 0.2s ease;
+}
+
+.nav-links a:hover {
+  color: #8f4f3c;
+}
+
+.nav-links a.active {
+  color: #8f4f3c;
+}
+
+/* Little line under active link */
+
+.nav-links a.active::after {
+  content: '';
+
+  position: absolute;
+
+  left: 50%;
+  bottom: -10px;
+
+  width: 5px;
+  height: 5px;
+
+  transform: translateX(-50%);
+
+  background: #b56e54;
+  border-radius: 50%;
+}
+
+/* CART */
+
+.cart-link {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.cart-badge {
+  min-width: 19px;
+  height: 19px;
+
+  padding: 0 5px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 50%;
+
+  background: #8f4f3c;
+  color: white;
+
+  font-size: 9px;
+}
+
+/* ACCOUNT */
+
+.account-link {
+  padding: 10px 15px;
+
+  border: 1px solid #ead5cc;
+  border-radius: 999px;
+
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.account-link:hover {
+  background: #fff2eb;
+}
+
+.account-link.active {
+  background: #fff2eb;
+}
+
+.account-link.active::after {
+  display: none;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 1000px) {
+  .navbar {
+    gap: 18px;
+  }
+
+  .brand {
+    min-width: auto;
+  }
+
+  .search-form {
+    max-width: 280px;
+  }
+
+  .nav-links {
+    gap: 15px;
+  }
+
+  .nav-links a {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 800px) {
+  .navbar {
+    height: auto;
+    min-height: 75px;
+    padding: 12px 5%;
+
+    flex-wrap: wrap;
+  }
+
+  .brand {
+    flex: 1;
+  }
+
+  .search-form {
+    order: 3;
+    max-width: none;
+    width: 100%;
+  }
+
+  .nav-links {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 550px) {
+  .navbar {
+    justify-content: space-between;
+  }
+
+  .brand-text small {
+    display: none;
+  }
+
+  .brand-text strong {
+    font-size: 16px;
+  }
+
+  .nav-links {
+    gap: 12px;
+  }
+
+  .nav-links a {
+    font-size: 9px;
+  }
+
+  .nav-links a:nth-child(2) {
+    display: none;
+  }
+
+  .account-link {
+    padding: 8px 11px;
+  }
+}
