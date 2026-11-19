@@ -1,0 +1,138 @@
+
+.menu-page {
+  min-height: 100vh;
+  padding: 65px 7%;
+  background: #fffaf7;
+}
+
+.menu-heading {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.menu-heading h1 {
+  font-family: Georgia, serif;
+  font-size: clamp(38px, 5vw, 54px);
+  color: #3a241d;
+  margin: 0;
+}
+
+.menu-heading > p:last-child {
+  color: #856c62;
+}
+
+.flavor-filters {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 45px;
+}
+
+.filter {
+  padding: 11px 23px;
+  border-radius: 30px;
+  border: 1px solid #ead8d0;
+  background: white;
+  color: #725b52;
+  cursor: pointer;
+}
+
+.filter.active,
+.filter:hover {
+  background: #8f4f3c;
+  color: white;
+  border-color: #8f4f3c;
+}
+
+.cake-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 28px;
+  max-width: 1200px;
+  margin: auto;
+}
+
+.cake-card {
+  overflow: hidden;
+  background: white;
+  border-radius: 20px;
+  border: 1px solid #f0dfd7;
+  transition: 0.25s;
+}
+
+.cake-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(70, 35, 20, 0.1);
+}
+
+.cake-card img {
+  width: 100%;
+  height: 240px;
+  object-fit: cover;
+}
+
+.cake-card-content {
+  padding: 22px;
+}
+
+.cake-flavor {
+  color: #b06d55;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 10px;
+  font-weight: bold;
+}
+
+.cake-card h2 {
+  font-family: Georgia, serif;
+  font-size: 22px;
+  color: #3a241d;
+  min-height: 52px;
+}
+
+.cake-card p {
+  font-size: 13px;
+  color: #90776d;
+}
+
+.cake-card-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.cake-card-bottom strong {
+  font-size: 19px;
+  color: #8f4f3c;
+}
+
+.cake-card-bottom button {
+  background: #8f4f3c;
+  color: white;
+  padding: 11px 15px;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+}
+
+.menu-message,
+.menu-error {
+  text-align: center;
+  padding: 30px;
+  color: #765e55;
+}
+
+@media (max-width: 850px) {
+  .cake-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 550px) {
+  .cake-grid {
+    grid-template-columns: 1fr;
+  }
+}

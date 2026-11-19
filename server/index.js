@@ -1,17 +1,49 @@
+
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
+
+import productRoutes from './routes/productRoutes.js';
+import offerRoutes from './routes/offerRoutes.js';
+import orderRoutes from './routes/orderRoutes.js';
+
 dotenv.config();
+
 const app = express();
-app.use(cors({ origin: process.env.CLIENT_URL || 'http://localhost:5173' }));
+
+app.use(cors({
+  origin: process.env.CLIENT_URL || 'http://localhost:5173'
+}));
+
 app.use(express.json());
-mongoose.connect(process.env.MONGO_URI, { dbName: 'crumb_and_craft_db' })
-.then(() => console.log('[DB] Connected to Crumb & Craft MongoDB Cluster'))
-.catch((err) => console.error('[DB] Connection failed:', err.message));
-app.get('/api/health', (req, res) => {
-res.status(200).json({ status: 'OK', service: 'Crumb & Craft Bakery API' });
+
+// DATABASE CONNECTION
+mongoose.connect(process.env.MONGO_URI, {
+  dbName: 'crumb_and_craft_db'
+})
+.then(() => {
+  console.log('[DB] Connected to Crumb & Craft MongoDB');
+})
+.catch((error) => {
+  console.error('[DB] Connection failed:', error.message);
 });
+
+// HEALTH CHECK
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'OK',
+    service: 'Crumb & Craft Bakery API'
+  });
+});
+
+// API ROUTES
+app.use('/api/products', productRoutes);
+app.use('/api/offers', offerRoutes);
+app.use('/api/orders', orderRoutes);
+
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`[SERVER] Listening on
-http://localhost:${PORT}`));
+
+app.listen(PORT, () => {
+  console.log(`[SERVER] Listening on http://localhost:${PORT}`);
+});
