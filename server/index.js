@@ -2,11 +2,15 @@ import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
 
 import productRoutes from './routes/productRoutes.js';
 import offerRoutes from './routes/offerRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import rbacRoutes from './routes/rbacRoutes.js';
+import authRoutes from './routes/authRoutes.js';
+
+import sessionMiddleware from './config/session.js';
 
 import {
   requestLogger,
@@ -17,9 +21,6 @@ dotenv.config();
 
 const app = express();
 
-app.use('/api/rbac', rbacRoutes);
-
-
 // MIDDLEWARE
 app.use(cors({
   origin:
@@ -28,11 +29,12 @@ app.use(cors({
 }));
 
 app.use(express.json());
+app.use(cookieParser());
+app.use(sessionMiddleware);
 
 
 // REQUEST LOGGER
 app.use(requestLogger);
-
 
 // DATABASE CONNECTION
 mongoose.connect(
@@ -69,22 +71,14 @@ app.get(
   }
 );
 
+// AUTHENTICATION
+app.use('/api/auth', authRoutes);
 
-// API ROUTES
-app.use(
-  '/api/products',
-  productRoutes
-);
-
-app.use(
-  '/api/offers',
-  offerRoutes
-);
-
-app.use(
-  '/api/orders',
-  orderRoutes
-);
+// EXISTING API ROUTES
+app.use('/api/products', productRoutes);
+app.use('/api/offers', offerRoutes);
+app.use('/api/orders', orderRoutes);
+app.use('/api/rbac', rbacRoutes);
 
 
 // GLOBAL ERROR HANDLER

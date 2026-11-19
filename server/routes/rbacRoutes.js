@@ -1,12 +1,20 @@
 
 import express from 'express';
-import { authorizeRoles, ROLES } from '../middleware/rbac.js';
+
+import {
+  authorizeRoles,
+  ROLES
+} from '../middleware/rbac.js';
+
+import {
+  authenticateAny
+} from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-// Accessible to all three roles
 router.get(
   '/products',
+  authenticateAny,
   authorizeRoles(
     ROLES.CUSTOMER,
     ROLES.VENDOR,
@@ -15,28 +23,28 @@ router.get(
   (req, res) => {
     res.json({
       success: true,
-      message: 'You can view bakery products.',
+      message: 'Product access granted.',
       role: req.user.role
     });
   }
 );
 
-// Only vendors and admins can add cakes
 router.post(
   '/products',
+  authenticateAny,
   authorizeRoles(ROLES.VENDOR, ROLES.ADMIN),
   (req, res) => {
     res.json({
       success: true,
-      message: 'Cake creation permission granted.',
+      message: 'Product creation permission granted.',
       role: req.user.role
     });
   }
 );
 
-// Only vendors and admins can manage orders
 router.patch(
   '/orders/:id/status',
+  authenticateAny,
   authorizeRoles(ROLES.VENDOR, ROLES.ADMIN),
   (req, res) => {
     res.json({
@@ -47,14 +55,14 @@ router.patch(
   }
 );
 
-// Only admins can access administrative operations
 router.get(
   '/admin',
+  authenticateAny,
   authorizeRoles(ROLES.ADMIN),
   (req, res) => {
     res.json({
       success: true,
-      message: 'Welcome to the admin panel.',
+      message: 'Admin access granted.',
       role: req.user.role
     });
   }
