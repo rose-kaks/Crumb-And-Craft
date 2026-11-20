@@ -1,5 +1,5 @@
 
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/auth';
 import { Link } from 'react-router-dom';
 import './AuthPages.css';
 
