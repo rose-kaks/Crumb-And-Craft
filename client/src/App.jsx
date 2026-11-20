@@ -22,7 +22,8 @@ import RegisterPage from './pages/RegisterPage';
 import CustomerDashboard from './pages/CustomerDashboard';
 import VendorDashboard from './pages/VendorDashboard';
 import AdminDashboard from './pages/AdminDashboard';
-import SessionComparisonPage from './pages/SessionComparisonPage';
+import SessionComparison from './pages/SessionComparison';
+import { CartProvider } from './context/CartContext';
 
 function UnauthorizedPage() {
   return (
@@ -39,78 +40,80 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
+        <CartProvider>
 
-        <Navbar cartCount={0} />
+          <Navbar cartCount={0} />
 
-        <Routes>
+          <Routes>
 
-          {/* PUBLIC ROUTES */}
-          <Route path="/" element={<HomePage />} />
-          <Route path="/menu" element={<CakeMenuPage />} />
-          <Route path="/cakes/:id" element={<CakeCustomizerPage />} />
-          <Route path="/cart" element={<CartPage />} />
+            {/* PUBLIC ROUTES */}
+            <Route path="/" element={<HomePage />} />
+            <Route path="/menu" element={<CakeMenuPage />} />
+            <Route path="/cakes/:id" element={<CakeCustomizerPage />} />
+            <Route path="/cart" element={<CartPage />} />
 
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
 
-          {/* CUSTOMER */}
-          <Route
-            path="/customer-dashboard"
-            element={
-              <ProtectedRoute allowedRoles={['customer']}>
-                <CustomerDashboard />
-              </ProtectedRoute>
-            }
-          />
+            {/* CUSTOMER */}
+            <Route
+              path="/customer-dashboard"
+              element={
+                <ProtectedRoute allowedRoles={['customer']}>
+                  <CustomerDashboard />
+                </ProtectedRoute>
+              }
+            />
 
-          <Route
-            path="/orders"
-            element={
-              <ProtectedRoute allowedRoles={['customer']}>
-                <OrdersPage />
-              </ProtectedRoute>
-            }
-          />
+            <Route
+              path="/orders"
+              element={
+                <ProtectedRoute allowedRoles={['customer']}>
+                  <OrdersPage />
+                </ProtectedRoute>
+              }
+            />
 
-          {/* BAKER */}
-          <Route
-            path="/vendor-dashboard"
-            element={
-              <ProtectedRoute allowedRoles={['vendor']}>
-                <VendorDashboard />
-              </ProtectedRoute>
-            }
-          />
+            {/* BAKER */}
+            <Route
+              path="/vendor-dashboard"
+              element={
+                <ProtectedRoute allowedRoles={['vendor']}>
+                  <VendorDashboard />
+                </ProtectedRoute>
+              }
+            />
 
-          {/* ADMIN */}
-          <Route
-            path="/admin-dashboard"
-            element={
-              <ProtectedRoute allowedRoles={['admin']}>
-                <AdminDashboard />
-              </ProtectedRoute>
-            }
-          />
+            {/* ADMIN */}
+            <Route
+              path="/admin-dashboard"
+              element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              }
+            />
 
-          {/* SESSION EXPERIMENT */}
-          <Route
-            path="/session-comparison"
-            element={
-              <ProtectedRoute
-                allowedRoles={['customer', 'vendor', 'admin']}
-              >
-                <SessionComparisonPage />
-              </ProtectedRoute>
-            }
-          />
+            {/* SESSION EXPERIMENT */}
+            <Route
+              path="/session-comparison"
+              element={
+                <ProtectedRoute
+                  allowedRoles={['customer', 'vendor', 'admin']}
+                >
+                  <SessionComparison />
+                </ProtectedRoute>
+              }
+            />
 
-          <Route
-            path="/unauthorized"
-            element={<UnauthorizedPage />}
-          />
+            <Route
+              path="/unauthorized"
+              element={<UnauthorizedPage />}
+            />
 
-        </Routes>
+          </Routes>
 
+        </CartProvider>
       </AuthProvider>
     </BrowserRouter>
   );

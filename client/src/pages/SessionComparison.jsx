@@ -1,4 +1,3 @@
-
 import { useAuth } from '../context/auth';
 import { Link } from 'react-router-dom';
 import './AuthPages.css';
@@ -29,7 +28,7 @@ const methods = {
   }
 };
 
-export default function SessionComparisonPage() {
+export default function SessionComparison() {
   const { user, mode } = useAuth();
 
   const active = methods[mode];

@@ -2,9 +2,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
+import { useCart } from '../context/useCart';
+import { getCustomizationKey } from '../context/cartReducer';
+import { useAuth } from '../context/auth';
 import './CartPage.css';
-
-const DEMO_USER_ID = '674a1f000000000000000001';
 
 export default function CartPage() {
   const [coupon, setCoupon] = useState('');
@@ -20,32 +21,20 @@ export default function CartPage() {
 
   const navigate = useNavigate();
 
-  const [cart, setCart] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem('bakeryCart') || '[]');
-    } catch {
-      return [];
-    }
-  });
+  const {
+    cart,
+    subtotal,
+    removeItem,
+    updateQuantity,
+    clearCart
+  } = useCart();
 
-  const subtotal = cart.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
+  // Read authentication context only once.
+  const { user, loading: authLoading } = useAuth();
 
   const total = subtotal - discount;
 
-  const updateCart = (newCart) => {
-    setCart(newCart);
-    localStorage.setItem('bakeryCart', JSON.stringify(newCart));
-    setDiscount(0);
-    setAppliedCoupon('');
-  };
-
-  const removeItem = (index) => {
-    updateCart(cart.filter((_, i) => i !== index));
-  };
-
+  // APPLY COUPON
   const applyCoupon = async () => {
     setMessage('');
 
@@ -65,25 +54,39 @@ export default function CartPage() {
     } catch (error) {
       setDiscount(0);
       setAppliedCoupon('');
+
       setMessage(
         error.response?.data?.message || 'Unable to validate coupon.'
       );
     }
   };
 
+  // PLACE PRE-ORDER
   const placeOrder = async () => {
     setMessage('');
+
+    if (authLoading) {
+      return setMessage('Please wait while your login is being verified.');
+    }
 
     if (cart.length === 0) {
       return setMessage('Your cart is empty.');
     }
 
-    if (fulfillment === 'Delivery' &&
-        (!street.trim() || !city.trim() || !postalCode.trim() || !phone.trim())) {
+    if (
+      fulfillment === 'Delivery' &&
+      (!street.trim() ||
+        !city.trim() ||
+        !postalCode.trim() ||
+        !phone.trim())
+    ) {
       return setMessage('Please complete your delivery address.');
     }
 
-    if (fulfillment === 'Delivery' && !/^[0-9]{10}$/.test(phone)) {
+    if (
+      fulfillment === 'Delivery' &&
+      !/^[0-9]{10}$/.test(phone)
+    ) {
       return setMessage('Enter a valid 10-digit phone number.');
     }
 
@@ -94,19 +97,32 @@ export default function CartPage() {
       return setMessage('Please select a future delivery date.');
     }
 
+    // Backend publicUser() returns id, not _id.
+    const authenticatedUserId = user?.id;
+
+    if (!authenticatedUserId) {
+      return setMessage('Please log in before placing an order.');
+    }
+
     setLoading(true);
 
     try {
       const response = await api.post('/orders/pre-order', {
-        userId: DEMO_USER_ID,
+        userId: authenticatedUserId,
 
         fulfillmentType: fulfillment,
 
         couponCode: appliedCoupon || null,
 
-        shippingAddress: fulfillment === 'Delivery'
-          ? { street, city, postalCode, phone }
-          : undefined,
+        shippingAddress:
+          fulfillment === 'Delivery'
+            ? {
+                street,
+                city,
+                postalCode,
+                phone
+              }
+            : undefined,
 
         items: cart.map(item => ({
           productId: item.productId,
@@ -117,9 +133,7 @@ export default function CartPage() {
         }))
       });
 
-      localStorage.removeItem('bakeryCart');
-
-      setCart([]);
+      clearCart();
 
       navigate('/orders', {
         state: {
@@ -129,6 +143,11 @@ export default function CartPage() {
       });
 
     } catch (error) {
+      console.error(
+        'Pre-order error:',
+        error.response?.data || error
+      );
+
       setMessage(
         error.response?.data?.message || 'Order could not be placed.'
       );
@@ -155,31 +174,64 @@ export default function CartPage() {
               </button>
             </div>
           ) : (
-            cart.map((item, index) => (
-              <article className="cart-item" key={`${item.productId}-${index}`}>
-                <div>
-                  <h3>{item.title}</h3>
-                  <p>{item.quantity} × ₹{item.price}</p>
-                  <p>
-                    {item.isEggless ? 'Eggless' : 'Regular'} ·
-                    {item.deliveryDate}
-                  </p>
-                  {item.cakeMessage && (
-                    <p>Message: {item.cakeMessage}</p>
-                  )}
-                </div>
+            cart.map(item => {
+              const itemKey = getCustomizationKey(item);
 
-                <div className="cart-item-actions">
-                  <strong>
-                    ₹{(item.price * item.quantity).toLocaleString('en-IN')}
-                  </strong>
+              return (
+                <article className="cart-item" key={itemKey}>
+                  <div>
+                    <h3>{item.title}</h3>
 
-                  <button onClick={() => removeItem(index)}>
-                    Remove
-                  </button>
-                </div>
-              </article>
-            ))
+                    <p>
+                      {item.quantity} × ₹{item.price}
+                    </p>
+
+                    <p>
+                      {item.isEggless ? 'Eggless' : 'Regular'} ·
+                      {item.deliveryDate}
+                    </p>
+
+                    {item.cakeMessage && (
+                      <p>Message: {item.cakeMessage}</p>
+                    )}
+                  </div>
+
+                  <div className="cart-item-actions">
+                    <strong>
+                      ₹{(
+                        item.price * item.quantity
+                      ).toLocaleString('en-IN')}
+                    </strong>
+
+                    <div>
+                      <button
+                        disabled={item.quantity <= 1}
+                        onClick={() =>
+                          updateQuantity(itemKey, item.quantity - 1)
+                        }
+                      >
+                        −
+                      </button>
+
+                      <span>{item.quantity}</span>
+
+                      <button
+                        disabled={item.quantity >= 20}
+                        onClick={() =>
+                          updateQuantity(itemKey, item.quantity + 1)
+                        }
+                      >
+                        +
+                      </button>
+                    </div>
+
+                    <button onClick={() => removeItem(itemKey)}>
+                      Remove
+                    </button>
+                  </div>
+                </article>
+              );
+            })
           )}
         </section>
 
@@ -194,7 +246,9 @@ export default function CartPage() {
                 onChange={e => setCoupon(e.target.value)}
               />
 
-              <button onClick={applyCoupon}>Apply</button>
+              <button onClick={applyCoupon}>
+                Apply
+              </button>
             </div>
 
             {appliedCoupon && (
@@ -258,17 +312,24 @@ export default function CartPage() {
               </div>
             )}
 
-            {message && <p className="cart-message">{message}</p>}
+            {message && (
+              <p className="cart-message">{message}</p>
+            )}
 
             <button
               className="place-order-btn"
-              disabled={loading}
+              disabled={loading || authLoading}
               onClick={placeOrder}
             >
-              {loading ? 'Placing Order...' : 'Place Pre-Order'}
+              {authLoading
+                ? 'Verifying Login...'
+                : loading
+                  ? 'Placing Order...'
+                  : 'Place Pre-Order'}
             </button>
           </aside>
         )}
+
       </div>
     </main>
   );

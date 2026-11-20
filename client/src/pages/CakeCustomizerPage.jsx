@@ -3,11 +3,13 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../api';
 import './CakeCustomizerPage.css';
+import { useCart } from '../context/useCart';
 
 const APP_START_TIME = Date.now();
 
 export default function CakeCustomizerPage() {
   const { id } = useParams();
+  const { addItem } = useCart();
   const navigate = useNavigate();
 
   const [cake, setCake] = useState(null);
@@ -26,7 +28,10 @@ export default function CakeCustomizerPage() {
   if (error) return <p>{error}</p>;
   if (!cake) return <p>Loading cake...</p>;
 
+  
   const addToCart = () => {
+    setError('');
+
     if (message.length > 60) {
       return setError('Message cannot exceed 60 characters.');
     }
@@ -41,6 +46,7 @@ export default function CakeCustomizerPage() {
 
     const selectedDate = new Date(`${deliveryDate}T00:00:00`);
     const minimumDate = new Date();
+
     minimumDate.setHours(0, 0, 0, 0);
     minimumDate.setHours(
       minimumDate.getHours() + cake.prepLeadHours
@@ -52,29 +58,19 @@ export default function CakeCustomizerPage() {
       );
     }
 
-    const cartItem = {
+    addItem({
       productId: cake._id,
       title: cake.title,
       price: cake.price,
       quantity,
-      cakeMessage: message,
+      cakeMessage: message.trim(),
       isEggless: eggless,
       deliveryDate
-    };
-
-    const existingCart = JSON.parse(
-      localStorage.getItem('bakeryCart') || '[]'
-    );
-
-    existingCart.push(cartItem);
-
-    localStorage.setItem(
-      'bakeryCart',
-      JSON.stringify(existingCart)
-    );
+    });
 
     navigate('/cart');
   };
+
 
   return (
     <main className="customizer-page">
